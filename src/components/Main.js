@@ -16,38 +16,64 @@ const Main = () => {
   const [city, setCity] = useState(null);
   const [error, setError] = useState(null);
 
-  const fetchLocation = async (e) => {
-    e.preventDefault();
-    setError(null);
-    const location = e.target.elements.location.value.trim();
+  const fetchLocation = async (location) => {
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?access_token=${process.env.REACT_APP_MAPBOX_API}&limit=1`;
 
-    if (location.length === 0) {
-      setError("Please enter a city name!");
-      setWeather(null);
-      return;
+    const response = await fetch(url);
+    const responseData = await response.json();
+
+    if (responseData.features.length === 0) {
+      return { latitude: null, longitude: null };
     }
 
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${process.env.REACT_APP_API_KEY}&units=metric`;
+    setCity(responseData.features[0].place_name);
+
+    return {
+      latitude: responseData.features[0].center[1],
+      longitude: responseData.features[0].center[0],
+    };
+  };
+
+  const getWeather = async (latitude, longitude, location) => {
+    let url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${process.env.REACT_APP_API_KEY}&units=metric`;
+
+    if (!latitude || !longitude) {
+      url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${process.env.REACT_APP_API_KEY}&units=metric`;
+    }
 
     const response = await fetch(url);
 
     if (response.status === 404) {
-      setWeather(null);
-      setCity(null);
       setError("Please enter a valid city name!");
       return;
     }
 
     if (!response.ok) {
-      setWeather(null);
-      setCity(null);
       setError("Something went wrong!");
       return;
     }
 
     const responseData = await response.json();
     setWeather(responseData.main);
-    setCity(responseData.name);
+    // setCity(responseData.name);
+  };
+
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+
+    setWeather(null);
+    setCity(null);
+    setError(null);
+
+    const location = e.target.elements.location.value.trim();
+
+    if (location.length === 0) {
+      setError("Please enter a city name!");
+      return;
+    }
+
+    const { latitude, longitude } = await fetchLocation(location);
+    getWeather(latitude, longitude, location);
   };
 
   return (
@@ -58,7 +84,7 @@ const Main = () => {
         <Tagline />
         <Context.Provider
           value={{
-            fetchLocation,
+            onSubmitHandler,
             weather,
             city,
           }}

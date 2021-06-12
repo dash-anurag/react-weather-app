@@ -3,11 +3,11 @@ import React, { useContext } from "react";
 import Context from "../Context";
 
 const WeatherSearch = () => {
-  const { fetchLocation } = useContext(Context);
+  const { onSubmitHandler } = useContext(Context);
 
   return (
     <div className="weather-search">
-      <form onSubmit={fetchLocation} className="weather-search__form">
+      <form onSubmit={onSubmitHandler} className="weather-search__form">
         <input
           name="location"
           autoComplete="off"
