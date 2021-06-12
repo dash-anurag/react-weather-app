@@ -32,11 +32,17 @@ const Main = () => {
     const response = await fetch(url);
 
     if (response.status === 404) {
-      return setError("Please enter a valid city name!");
+      setWeather(null);
+      setCity(null);
+      setError("Please enter a valid city name!");
+      return;
     }
 
     if (!response.ok) {
-      return setError("Something went wrong!");
+      setWeather(null);
+      setCity(null);
+      setError("Something went wrong!");
+      return;
     }
 
     const responseData = await response.json();
