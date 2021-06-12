@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 
 import Context from "../Context";
 
@@ -30,11 +29,19 @@ const Main = () => {
 
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${process.env.REACT_APP_API_KEY}&units=metric`;
 
-    const request = await axios.get(url);
+    const response = await fetch(url);
 
-    const response = await request;
-    setWeather(response.data.main);
-    setCity(response.data.name);
+    if (response.status === 404) {
+      return setError("Please enter a valid city name!");
+    }
+
+    if (!response.ok) {
+      return setError("Something went wrong!");
+    }
+
+    const responseData = await response.json();
+    setWeather(responseData.main);
+    setCity(responseData.name);
   };
 
   return (
