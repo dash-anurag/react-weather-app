@@ -1,10 +1,15 @@
-import React from 'react'
+import React, { useContext } from "react";
+
+import Context from "../Context";
 
 const WeatherSearch = () => {
+  const { fetchLocation } = useContext(Context);
+
   return (
     <div className="weather-search">
-      <form className="weather-search__form">
+      <form onSubmit={fetchLocation} className="weather-search__form">
         <input
+          name="location"
           autoComplete="off"
           className="weather-search__input"
           type="text"
@@ -15,6 +20,6 @@ const WeatherSearch = () => {
       </form>
     </div>
   );
-}
+};
 
-export default WeatherSearch
+export default WeatherSearch;
